@@ -97,14 +97,22 @@ class AssignmentNode(ASTNode):
 
 
 class IfNode(ASTNode):
-    def __init__(self, condition, if_body, else_body=None):
+    def __init__(self, condition, if_body, next_body=None):
         self.condition = condition
         self.if_body = if_body
-        self.else_body = else_body
+        self.next_body = next_body
 
     def __repr__(self):
-        return f"IfNode(condition={self.condition}, if_body={self.if_body}, else_body={self.else_body})"
+        return f"IfNode(condition={self.condition}, if_body={self.if_body}, next_body={self.next_body})"
+    
+class ElIfNode(ASTNode):
+    def __init__(self, condition, elif_body, next_body=None):
+        self.condition = condition
+        self.elif_body = elif_body
+        self.next_body = next_body
 
+    def __repr__(self):
+        return f"IfNode(condition={self.condition}, if_body={self.if_body}, next_body={self.next_body})"
 
 class ForNode(ASTNode):
     def __init__(self, init, condition, update, body):

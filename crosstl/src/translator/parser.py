@@ -1,24 +1,7 @@
 # compiler/parser.py
+import lexer
+import ast
 
-from .ast import (
-    ShaderNode,
-    FunctionNode,
-    AssignmentNode,
-    IfNode,
-    ForNode,
-    ReturnNode,
-    FunctionCallNode,
-    BinaryOpNode,
-    MemberAccessNode,
-    VariableNode,
-    UniformNode,
-    UnaryOpNode,
-    TernaryOpNode,
-    VERTEXShaderNode,
-    FRAGMENTShaderNode,
-)
-
-from .lexer import Lexer
 
 
 class Parser:
@@ -472,6 +455,12 @@ class Parser:
         self.eat("LBRACE")
         if_body = self.parse_body()
         self.eat("RBRACE")
+
+        if self.current_token[0] == "ELSE_IF":
+            next_body = self.parse_else_if_statement()
+            return IfNode(condition, if_body, next_body)
+        
+
         else_body = None
         if self.current_token[0] == "ELSE":
             self.eat("ELSE")
@@ -479,6 +468,27 @@ class Parser:
             else_body = self.parse_body()
             self.eat("RBRACE")
         return IfNode(condition, if_body, else_body)
+    
+    def parse_else_if_statement(self):
+        self.eat("ELSE_IF")
+        self.eat("LPAREN")
+        condition = self.parse_expression()
+        self.eat("RPAREN")
+        self.eat("LBRACE")
+        elif_body = self.parse_body()
+        self.eat("RBRACE")
+
+        if self.current_token[0] == "ELSE_IF":
+            next_body = self.parse_else_if_statement()
+            return ElIfNode(condition, elif_body, next_body)
+        
+        else_body = None
+        if self.current_token[0] == "ELSE":
+            self.eat("ELSE")
+            self.eat("LBRACE")
+            else_body = self.parse_body()
+            self.eat("RBRACE")
+        return ElIfNode(condition, elif_body, else_body)
 
     def peak(self, n):
         """Peek ahead in the token list
